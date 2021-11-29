@@ -1,14 +1,18 @@
-package main
+package models
 
 import (
-	"time"
+	"gorm.io/gorm"
 )
 
 type Agent struct {
-	ID        uint `gorm:"primaryKey"`
+	gorm.Model
 	Name      string
-	Abilities []string
+	Abilities []Abilities `gorm:"many2many:agent_abilities;"`
 	Ult       string
-	CreatedAt time.Time
-	UpdatedAt time.Time
+}
+
+type Abilities struct {
+	gorm.Model
+	Name        string
+	Description string
 }
