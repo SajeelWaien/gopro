@@ -2,6 +2,10 @@ module github.com/sajeelwaien/gopro
 
 go 1.16
 
+replace github.com/sajeelwaien/gopro/database => ./Database
+replace github.com/sajeelwaien/gopro/migrations => ./Migrations
+replace github.com/sajeelwaien/gopro/models => ./Models
+
 require (
 	github.com/cosmtrek/air v1.27.6 // indirect
 	github.com/fatih/color v1.13.0 // indirect
@@ -16,4 +20,7 @@ require (
 	golang.org/x/sys v0.0.0-20211124211545-fe61309f8881 // indirect
 	gorm.io/driver/postgres v1.2.2 // indirect
 	gorm.io/gorm v1.22.3 // indirect
+	github.com/sajeelwaien/gopro/database v1.0.0
+	github.com/sajeelwaien/gopro/migrations v1.0.0
+	github.com/sajeelwaien/gopro/models v1.0.0
 )

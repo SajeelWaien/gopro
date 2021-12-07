@@ -6,6 +6,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
+	agents "github.com/sajeelwaien/gopro/Agents"
 	"github.com/sajeelwaien/gopro/database"
 	"github.com/sajeelwaien/gopro/migrations"
 	"github.com/sajeelwaien/gopro/models"
@@ -40,7 +41,8 @@ func main() {
 
 		r.HandleFunc("/hello/{name}", helloHandler)
 		agentRouter := r.PathPrefix("/agents").Subrouter()
-		agentRouter.HandleFunc("/{class}", agentHandler)
+		// agentRouter.HandleFunc("/{class}", agentHandler)
+		agentRouter.HandleFunc("/add", agents.AddAgent).Methods("POST")
 		fmt.Print("Running on Port 5000")
 		http.ListenAndServe(":5000", r)
 	}
