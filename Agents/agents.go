@@ -5,18 +5,35 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/sajeelwaien/gopro/database"
 	"github.com/sajeelwaien/gopro/models"
 )
+
+type PersonInput struct {
+	Name string `json:name`
+	Ult  string `json:ult`
+}
 
 func AddAgent(r http.ResponseWriter, req *http.Request) {
 	var agent models.Agent
 
-	_ = json.NewDecoder(req.Body).Decode(&agent)
+	err := json.NewDecoder(req.Body).Decode(&agent)
+
+	if err != nil {
+		fmt.Printf("ERROR %+v", agent)
+		http.Error(r, err.Error(), http.StatusBadRequest)
+		return
+	}
 
 	// fmt.Printf("%+v\n", newAgent)
 
-	fmt.Fprintf(r, "%+v\n", req.Body)
-	// newAgent := models.Agent{}
+	newAgent := models.Agent{Name: agent.Name, Ult: agent.Ult, Abilities: agent.Abilities}
 
-	// database.DBCon.Create()
+	result := database.DBCon.Create(&newAgent)
+
+	if result.Error != nil {
+		http.Error(r, result.Error.Error(), http.StatusBadRequest)
+	}
+
+	fmt.Fprintf(r, "%+v\n", agent)
 }

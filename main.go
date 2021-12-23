@@ -9,7 +9,6 @@ import (
 	agents "github.com/sajeelwaien/gopro/Agents"
 	"github.com/sajeelwaien/gopro/database"
 	"github.com/sajeelwaien/gopro/migrations"
-	"github.com/sajeelwaien/gopro/models"
 )
 
 func helloHandler(writer http.ResponseWriter, request *http.Request) {
@@ -36,9 +35,6 @@ func main() {
 	if err != nil {
 		fmt.Println("Error ", err)
 	} else {
-		user := models.Agent{Name: "Omen", Ult: "Teleport"}
-		database.DBCon.Create(&user)
-
 		r.HandleFunc("/hello/{name}", helloHandler)
 		agentRouter := r.PathPrefix("/agents").Subrouter()
 		// agentRouter.HandleFunc("/{class}", agentHandler)

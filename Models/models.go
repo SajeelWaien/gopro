@@ -9,6 +9,7 @@ type Agent struct {
 	Name      string
 	Abilities []Abilities `gorm:"many2many:agent_abilities;"`
 	Ult       string
+	class     string
 }
 
 type Abilities struct {
