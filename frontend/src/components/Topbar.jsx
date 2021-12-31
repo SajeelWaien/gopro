@@ -3,12 +3,12 @@ import { Link } from "react-location"
 
 const Topbar = () => {
   return (
-    <Box>
+    <Box position='absolute' width='100%' left={0} top={0}>
       <Box width='100%' height='50px' bgColor='brand' position='absolute' opacity='0.7'>
-        <Center>
+        <Center height={'100%'}>
           <HStack>
             <Box>
-              {/* <Link
+              <Link
                 to={'add-agent'}
                 className={``}
                 // // Make "active" links bold
@@ -20,7 +20,7 @@ const Topbar = () => {
                 // }}
               >
                 Add New
-              </Link> */}
+              </Link>
             </Box>
           </HStack>
         </Center>
