@@ -6,14 +6,14 @@ import (
 
 type Agent struct {
 	gorm.Model
-	Name      string
-	Abilities []Abilities `gorm:"many2many:agent_abilities;"`
-	Ult       string
-	class     string
+	Name      string      `json:"name"`
+	Abilities []Abilities `gorm:"many2many:agent_abilities;" json:"abilities"`
+	Ult       string      `json:"ult"`
+	Class     string      `json:"class"`
 }
 
 type Abilities struct {
 	gorm.Model
-	Name        string
-	Description string
+	Name        string `json:"name"`
+	Description string `json:"description"`
 }
