@@ -1,6 +1,8 @@
 package schemas
 
 import (
+	"fmt"
+
 	"github.com/graphql-go/graphql"
 	"github.com/sajeelwaien/gopro/database"
 	"github.com/sajeelwaien/gopro/models"
@@ -11,16 +13,16 @@ var classesEnum = graphql.NewEnum(graphql.EnumConfig{
 	Description: "Class to which a character belongs to based on abilities and playing style",
 	Values: graphql.EnumValueConfigMap{
 		"Sentinel": &graphql.EnumValueConfig{
-			Value: 1,
+			Value: "Sentinel",
 		},
 		"Duelist": &graphql.EnumValueConfig{
-			Value: 2,
+			Value: "Duelist",
 		},
 		"Initiator": &graphql.EnumValueConfig{
-			Value: 3,
+			Value: "Initiator",
 		},
 		"Controller": &graphql.EnumValueConfig{
-			Value: 4,
+			Value: "Controller",
 		},
 	},
 })
@@ -38,7 +40,23 @@ var agentType = graphql.NewObject(graphql.ObjectConfig{
 			Type: graphql.String,
 		},
 		"class": &graphql.Field{
-			Type: graphql.NewList(classesEnum),
+			Type: classesEnum,
+		},
+	},
+})
+
+var rootQuery = graphql.NewObject(graphql.ObjectConfig{
+	Name: "RootQuery",
+	Fields: graphql.Fields{
+		"listAgents": &graphql.Field{
+			Type:        graphql.NewList(agentType),
+			Description: "Returns a list of all agents.",
+			Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+				var agents []models.Agent
+				result := database.DBCon.Find(&agents)
+				fmt.Printf("%+v : %+v", agents, result)
+				return &agents, nil
+			},
 		},
 	},
 })
@@ -57,7 +75,7 @@ var rootMutation = graphql.NewObject(graphql.ObjectConfig{
 					Type: graphql.NewNonNull(graphql.String),
 				},
 				"class": &graphql.ArgumentConfig{
-					Type: graphql.NewList(classesEnum),
+					Type: classesEnum,
 				},
 			},
 			Resolve: func(params graphql.ResolveParams) (interface{}, error) {
@@ -65,16 +83,23 @@ var rootMutation = graphql.NewObject(graphql.ObjectConfig{
 				ult, _ := params.Args["ult"].(string)
 				class, _ := params.Args["class"].(string)
 
+				fmt.Printf("{}, {}, {}", name, ult, class)
+
 				agent := models.Agent{Name: name, Ult: ult, Class: class}
 
 				result := database.DBCon.Create(&agent)
 
-				return result, nil
+				if result.Error != nil {
+					return nil, result.Error
+				}
+
+				return &agent, nil
 			},
 		},
 	},
 })
 
 var AgentSchema, _ = graphql.NewSchema(graphql.SchemaConfig{
+	Query:    rootQuery,
 	Mutation: rootMutation,
 })

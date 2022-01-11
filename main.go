@@ -14,6 +14,10 @@ import (
 	"github.com/sajeelwaien/gopro/schemas"
 )
 
+type body struct {
+	query string
+}
+
 func helloHandler(writer http.ResponseWriter, request *http.Request) {
 	vars := mux.Vars(request)
 	fmt.Fprintf(writer, "Hello From %s", vars["name"])
@@ -27,13 +31,14 @@ func agentHandler(writer http.ResponseWriter, request *http.Request) {
 }
 
 func executeQuery(query string, schema graphql.Schema) *graphql.Result {
+	fmt.Printf("QUERY2 {}", query)
 	result := graphql.Do(graphql.Params{
 		Schema:        schema,
 		RequestString: query,
 	})
 
 	if len(result.Errors) > 0 {
-		fmt.Printf("wrong result.")
+		fmt.Printf("wrong result. {}", result.Errors)
 	}
 	return result
 }
@@ -51,7 +56,13 @@ func main() {
 		fmt.Println("Error ", err)
 	} else {
 		r.HandleFunc("/graphql", func(w http.ResponseWriter, r *http.Request) {
-			result := executeQuery(r.URL.Query().Get("query"), schemas.AgentSchema)
+			var query map[string]interface{}
+			err := json.NewDecoder(r.Body).Decode(&query)
+			if err != nil {
+				fmt.Printf("Error decoding request body", err)
+			}
+			fmt.Printf("QUERY: {}", query["query"].(string), err)
+			result := executeQuery(query["query"].(string), schemas.AgentSchema)
 			json.NewEncoder(w).Encode(result)
 		})
 
