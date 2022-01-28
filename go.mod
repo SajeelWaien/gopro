@@ -14,6 +14,7 @@ require (
 	github.com/cosmtrek/air v1.27.6 // indirect
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
+	github.com/gorilla/handlers v1.5.1 // indirect
 	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/graphql-go/graphql v0.8.0 // indirect
 	github.com/jackc/pgx/v4 v4.14.0 // indirect

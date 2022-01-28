@@ -1,17 +1,18 @@
 import { gql } from 'graphql-request'
 import { useMutation } from 'react-query'
-import { graphql } from '../config/request'
+import { graphql, axios } from '../config/request'
+// import axios from 'axios'
 
 export type AgentType = {
   name: string,
   ult: string,
-  class: string[]
+  class: string
 }
 
 const AddAgentMutation = (/* variables: AgentType */) => {
   const mutation = gql`
-    mutation AddAgent($name: String!, $ult: String!, $class: String!){
-      addAgent(name: $name, ult: $ult, class: $class) {
+    mutation AddAgent($name: String!, $ult: String!, $class: Class!){
+      addAgent(object: {name: $name, ult: $ult, class: $class}) {
         name
         ult
         class
@@ -20,6 +21,7 @@ const AddAgentMutation = (/* variables: AgentType */) => {
   `
 
   return useMutation((newAgent: AgentType) => {
+    console.log(newAgent)
     return graphql.request(mutation, newAgent)
   })
 }

@@ -10,7 +10,7 @@ interface HomeProps {
 }
 
 const AddAgent:React.FC<HomeProps> = (props) => {
-  const [state, setState] = useState<AgentType>({name: "", ult: "", class: []})
+  const [state, setState] = useState<AgentType>({name: "", ult: "", class: ""})
   const mutation = addAgentMutation()
 
   const submit = () => {
@@ -30,8 +30,8 @@ const AddAgent:React.FC<HomeProps> = (props) => {
           <Input variant="outline" value={state.ult} onChange={(e) => setState({...state, ult: e.target.value})} />
         </FormControl>
         <FormControl>
-          <FormLabel>Abilities</FormLabel>
-          <Input variant="outline" /* value={state.class.join(',')} */ onChange={(e) => setState({...state, class: e.target.value.split(',')})} />
+          <FormLabel>Class</FormLabel>
+          <Input variant="outline" value={state.class} onChange={(e) => setState({...state, class: e.target.value})} />
         </FormControl>
         <Button colorScheme='brand' onClick={submit}>Add</Button>
       </VStack>

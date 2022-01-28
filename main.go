@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/graphql-go/graphql"
 	"github.com/joho/godotenv"
@@ -31,7 +32,7 @@ func agentHandler(writer http.ResponseWriter, request *http.Request) {
 }
 
 func executeQuery(query string, schema graphql.Schema) *graphql.Result {
-	fmt.Printf("QUERY2 {}", query)
+	// fmt.Printf("QUERY2 {}", query)
 	result := graphql.Do(graphql.Params{
 		Schema:        schema,
 		RequestString: query,
@@ -45,6 +46,9 @@ func executeQuery(query string, schema graphql.Schema) *graphql.Result {
 
 func main() {
 	r := mux.NewRouter()
+	header := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"})
+	methods := handlers.AllowedMethods([]string{"GET", "POST", "PUT", "HEAD", "OPTIONS"})
+	origins := handlers.AllowedOrigins([]string{"*"})
 
 	err := godotenv.Load(".env")
 
@@ -61,16 +65,16 @@ func main() {
 			if err != nil {
 				fmt.Printf("Error decoding request body", err)
 			}
-			fmt.Printf("QUERY: {}", query["query"].(string), err)
+			// fmt.Printf("QUERY: {}", query["query"].(string), err)
 			result := executeQuery(query["query"].(string), schemas.AgentSchema)
 			json.NewEncoder(w).Encode(result)
-		})
+		}).Methods("GET", "POST", "OPTIONS", "DELETE", "PUT", "PATCH")
 
 		r.HandleFunc("/hello/{name}", helloHandler)
 		agentRouter := r.PathPrefix("/agents").Subrouter()
 		// agentRouter.HandleFunc("/{class}", agentHandler)
 		agentRouter.HandleFunc("/add", agents.AddAgent).Methods("POST")
 		fmt.Print("Running on Port 5000")
-		http.ListenAndServe(":5000", r)
+		http.ListenAndServe(":5000", handlers.CORS(header, methods, origins)(r))
 	}
 }

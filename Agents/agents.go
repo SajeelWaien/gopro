@@ -25,7 +25,7 @@ func AddAgent(r http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	// fmt.Printf("%+v\n", newAgent)
+	fmt.Printf("%+v\n", agent)
 
 	newAgent := models.Agent{Name: agent.Name, Ult: agent.Ult, Abilities: agent.Abilities}
 
