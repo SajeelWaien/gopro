@@ -16,7 +16,8 @@ import (
 )
 
 type body struct {
-	query string
+	Query     string                 `json:"query"`
+	Variables map[string]interface{} `json:"variables"`
 }
 
 func helloHandler(writer http.ResponseWriter, request *http.Request) {
@@ -31,15 +32,18 @@ func agentHandler(writer http.ResponseWriter, request *http.Request) {
 	fmt.Fprintf(writer, "%s", category)
 }
 
-func executeQuery(query string, schema graphql.Schema) *graphql.Result {
-	// fmt.Printf("QUERY2 {}", query)
+func executeQuery(query string, schema graphql.Schema, variables map[string]interface{}) *graphql.Result {
+	// fmt.Printf("QUERY2 %s", query)
+	fmt.Println("Variables", variables)
 	result := graphql.Do(graphql.Params{
-		Schema:        schema,
-		RequestString: query,
+		Schema:         schema,
+		RequestString:  query,
+		RootObject:     nil,
+		VariableValues: variables,
 	})
 
 	if len(result.Errors) > 0 {
-		fmt.Printf("wrong result. {}", result.Errors)
+		fmt.Printf("wrong result. %+v\n", result.Errors)
 	}
 	return result
 }
@@ -60,13 +64,18 @@ func main() {
 		fmt.Println("Error ", err)
 	} else {
 		r.HandleFunc("/graphql", func(w http.ResponseWriter, r *http.Request) {
-			var query map[string]interface{}
-			err := json.NewDecoder(r.Body).Decode(&query)
-			if err != nil {
-				fmt.Printf("Error decoding request body", err)
+			var requestBody body
+			// var vars map[string]interface{}
+			errBody := json.NewDecoder(r.Body).Decode(&requestBody)
+			// errVars := json.Unmarshal(requestBody.Variables, &vars)
+			if errBody != nil {
+				fmt.Printf("Error decoding request body: %+v\n", errBody)
 			}
-			// fmt.Printf("QUERY: {}", query["query"].(string), err)
-			result := executeQuery(query["query"].(string), schemas.AgentSchema)
+			// if errVars != nil {
+			// 	fmt.Printf("Error decoding query variables: %+v\n", errVars)
+			// }
+			// fmt.Printf("QUERY: {}", requestBody.Variables)
+			result := executeQuery(requestBody.Query, schemas.AgentSchema, requestBody.Variables)
 			json.NewEncoder(w).Encode(result)
 		}).Methods("GET", "POST", "OPTIONS", "DELETE", "PUT", "PATCH")
 

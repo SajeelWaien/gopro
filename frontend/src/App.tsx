@@ -4,6 +4,7 @@ import { Container } from '@chakra-ui/layout';
 import Home from './pages/Home'
 import Topbar from './components/Topbar';
 import AddAgent from './pages/AddAgent';
+import ListAgents from './pages/ListAgents';
 
 const location = new ReactLocation()
 
@@ -15,7 +16,8 @@ function App() {
           location={location}
           routes={[
             { path: "/", element: <Home /> },
-            { path: "/add-agent", element: <AddAgent /> }
+            { path: "/add-agent", element: <AddAgent /> },
+            { path: "/list-agents", element: <ListAgents /> }
           ]}
         >
           <Topbar />

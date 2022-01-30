@@ -10,9 +10,9 @@ export type AgentType = {
 }
 
 const AddAgentMutation = (/* variables: AgentType */) => {
-  const mutation = gql`
-    mutation AddAgent($name: String!, $ult: String!, $class: Class!){
-      addAgent(object: {name: $name, ult: $ult, class: $class}) {
+  const mutation = `
+    mutation addAgent($name: String!, $ult: String!, $class: Class){
+      addAgent(name: $name, ult: $ult, class: $class) {
         name
         ult
         class

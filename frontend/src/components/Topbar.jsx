@@ -21,6 +21,9 @@ const Topbar = () => {
               >
                 Add New
               </Link>
+              <Link to={'list-agents'} className={``}>
+                List Agents
+              </Link>
             </Box>
           </HStack>
         </Center>
