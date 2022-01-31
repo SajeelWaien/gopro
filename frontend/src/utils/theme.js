@@ -13,7 +13,17 @@ const inputVariantOutlined = () => ({
 
 const theme = extendTheme({
   colors: {
-    brand: PRIMARY_COLOR,
+    brand: {
+      100: '#FF9AA2',
+      200: '#FF8993',
+      300: '#FF7884',
+      400: '#FF6874',
+      500: PRIMARY_COLOR,
+      600: '#E64E5B',
+      700: '#CC4551',
+      800: '#B33D47',
+      900: '#99343C',
+    }
   },
   styles: {
     global: {
@@ -39,7 +49,7 @@ const theme = extendTheme({
     Heading: {
       baseStyle: {
         textDecoration: 'underline',
-        textDecorationColor: 'brand',
+        textDecorationColor: 'brand.500',
         textUnderlineOffset: '10px'
       },
     }

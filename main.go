@@ -65,23 +65,21 @@ func main() {
 	} else {
 		r.HandleFunc("/graphql", func(w http.ResponseWriter, r *http.Request) {
 			var requestBody body
-			// var vars map[string]interface{}
+
 			errBody := json.NewDecoder(r.Body).Decode(&requestBody)
-			// errVars := json.Unmarshal(requestBody.Variables, &vars)
+
 			if errBody != nil {
 				fmt.Printf("Error decoding request body: %+v\n", errBody)
 			}
-			// if errVars != nil {
-			// 	fmt.Printf("Error decoding query variables: %+v\n", errVars)
-			// }
-			// fmt.Printf("QUERY: {}", requestBody.Variables)
+
 			result := executeQuery(requestBody.Query, schemas.AgentSchema, requestBody.Variables)
-			json.NewEncoder(w).Encode(result)
+			fmt.Printf("RESULT: %+v", result)
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(&result)
 		}).Methods("GET", "POST", "OPTIONS", "DELETE", "PUT", "PATCH")
 
 		r.HandleFunc("/hello/{name}", helloHandler)
 		agentRouter := r.PathPrefix("/agents").Subrouter()
-		// agentRouter.HandleFunc("/{class}", agentHandler)
 		agentRouter.HandleFunc("/add", agents.AddAgent).Methods("POST")
 		fmt.Print("Running on Port 5000")
 		http.ListenAndServe(":5000", handlers.CORS(header, methods, origins)(r))

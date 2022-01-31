@@ -13,9 +13,12 @@ function useListAgents() {
                 }
             }
         `
-        const { listAgents } = await graphql.request(query)
-        console.log("@@@@@ ", listAgents)
-        return listAgents
+        console.log("Listing Logging");
+        const  {listAgents: data}  = await graphql.request(query)
+        console.log("Listing ", data)
+        return data
+    }, {
+        refetchOnWindowFocus: false
     })
 }
 

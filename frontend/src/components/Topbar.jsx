@@ -4,9 +4,9 @@ import { Link } from "react-location"
 const Topbar = () => {
   return (
     <Box position='absolute' width='100%' left={0} top={0}>
-      <Box width='100%' height='50px' bgColor='brand' position='absolute' opacity='0.7'>
+      <Box width='100%' height='50px' bgColor='brand.500' position='absolute' opacity='0.7'>
         <Center height={'100%'}>
-          <HStack>
+          <HStack spacing={5}>
             <Box>
               <Link
                 to={'add-agent'}
@@ -21,6 +21,8 @@ const Topbar = () => {
               >
                 Add New
               </Link>
+            </Box>
+            <Box>
               <Link to={'list-agents'} className={``}>
                 List Agents
               </Link>
@@ -32,7 +34,7 @@ const Topbar = () => {
         <Box
           width='80px'
           height={200}
-          bgColor='brand'
+          bgColor='brand.500'
           sx={{ clipPath: "polygon(0px 0px, 100% 50%, 100% 100%, 0 50%)" }}
         >
 
@@ -42,7 +44,7 @@ const Topbar = () => {
         <Box
           width='80px'
           height={200}
-          bgColor='brand'
+          bgColor='brand.500'
           transform={'scaleY(-1)'}
           sx={{ clipPath: "polygon(0px 0px, 100% 50%, 100% 100%, 0 50%)" }}
         >

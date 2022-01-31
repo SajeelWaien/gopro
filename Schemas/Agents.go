@@ -54,7 +54,11 @@ var rootQuery = graphql.NewObject(graphql.ObjectConfig{
 			Resolve: func(params graphql.ResolveParams) (interface{}, error) {
 				var agents []models.Agent
 				result := database.DBCon.Find(&agents)
-				fmt.Printf("%+v : %+v", agents, result)
+
+				if result.Error != nil {
+					return nil, result.Error
+				}
+
 				return &agents, nil
 			},
 		},
