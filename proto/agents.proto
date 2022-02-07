@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+option go_package = "github.com/sajeelwaien/gopro";
+
+message AgentName {
+  string name = 1;
+}
+
+message SelectedAgentReply {
+  string message = 1;
+}
+
+service SelectAgent {
+  rpc SelectAgent (AgentName) returns (SelectedAgentReply) {}
+}
