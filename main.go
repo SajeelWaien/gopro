@@ -1,18 +1,20 @@
 package main
 
 import (
-	"encoding/json"
+	"context"
 	"fmt"
+	"log"
+	"net"
 	"net/http"
 
-	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/graphql-go/graphql"
 	"github.com/joho/godotenv"
-	agents "github.com/sajeelwaien/gopro/Agents"
 	"github.com/sajeelwaien/gopro/database"
 	"github.com/sajeelwaien/gopro/migrations"
-	"github.com/sajeelwaien/gopro/schemas"
+	"github.com/sajeelwaien/gopro/models"
+	"github.com/sajeelwaien/gopro/proto"
+	"google.golang.org/grpc"
 )
 
 type body struct {
@@ -48,40 +50,88 @@ func executeQuery(query string, schema graphql.Schema, variables map[string]inte
 	return result
 }
 
-func main() {
-	r := mux.NewRouter()
-	header := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"})
-	methods := handlers.AllowedMethods([]string{"GET", "POST", "PUT", "HEAD", "OPTIONS"})
-	origins := handlers.AllowedOrigins([]string{"*"})
+// func main() {
+// 	r := mux.NewRouter()
+// 	header := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"})
+// 	methods := handlers.AllowedMethods([]string{"GET", "POST", "PUT", "HEAD", "OPTIONS"})
+// 	origins := handlers.AllowedOrigins([]string{"*"})
 
-	err := godotenv.Load(".env")
+// 	err := godotenv.Load(".env")
+
+// 	database.InitDB()
+
+// 	migrations.Migrate()
+
+// 	if err != nil {
+// 		fmt.Println("Error ", err)
+// 	} else {
+// 		r.HandleFunc("/graphql", func(w http.ResponseWriter, r *http.Request) {
+// 			var requestBody body
+
+// 			errBody := json.NewDecoder(r.Body).Decode(&requestBody)
+
+// 			if errBody != nil {
+// 				fmt.Printf("Error decoding request body: %+v\n", errBody)
+// 			}
+
+// 			result := executeQuery(requestBody.Query, schemas.AgentSchema, requestBody.Variables)
+// 			fmt.Printf("RESULT: %+v", result)
+// 			w.Header().Set("Content-Type", "application/json")
+// 			json.NewEncoder(w).Encode(&result)
+// 		}).Methods("GET", "POST", "OPTIONS", "DELETE", "PUT", "PATCH")
+
+// 		r.HandleFunc("/hello/{name}", helloHandler)
+// 		agentRouter := r.PathPrefix("/agents").Subrouter()
+// 		agentRouter.HandleFunc("/add", agents.AddAgent).Methods("POST")
+// 		fmt.Print("Running on Port 5000")
+// 		http.ListenAndServe(":5000", handlers.CORS(header, methods, origins)(r))
+// 	}
+// }
+
+type Server struct {
+	proto.UnimplementedSelectAgentServer
+}
+
+func (s *Server) SelectAgent(ctx context.Context, message *proto.AgentName) (*proto.SelectedAgentReply, error) {
+	log.Printf("Message from client: %s", message.Name)
+
+	var agent models.Agent
+	result := database.DBCon.Where("name = ?", message.Name).First(&agent)
+
+	log.Printf("===> %+v", &agent)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &proto.SelectedAgentReply{
+		Message: agent.Class,
+	}, nil
+}
+
+func main() {
+	lis, err := net.Listen("tcp", ":9000")
+	if err != nil {
+		log.Fatalf("Cannot listen")
+	}
+
+	errEnv := godotenv.Load(".env")
+
+	if errEnv != nil {
+		fmt.Println("Error ", err)
+	}
 
 	database.InitDB()
 
 	migrations.Migrate()
 
-	if err != nil {
-		fmt.Println("Error ", err)
-	} else {
-		r.HandleFunc("/graphql", func(w http.ResponseWriter, r *http.Request) {
-			var requestBody body
+	s := Server{}
 
-			errBody := json.NewDecoder(r.Body).Decode(&requestBody)
+	grpcServer := grpc.NewServer()
 
-			if errBody != nil {
-				fmt.Printf("Error decoding request body: %+v\n", errBody)
-			}
+	proto.RegisterSelectAgentServer(grpcServer, &s)
 
-			result := executeQuery(requestBody.Query, schemas.AgentSchema, requestBody.Variables)
-			fmt.Printf("RESULT: %+v", result)
-			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(&result)
-		}).Methods("GET", "POST", "OPTIONS", "DELETE", "PUT", "PATCH")
-
-		r.HandleFunc("/hello/{name}", helloHandler)
-		agentRouter := r.PathPrefix("/agents").Subrouter()
-		agentRouter.HandleFunc("/add", agents.AddAgent).Methods("POST")
-		fmt.Print("Running on Port 5000")
-		http.ListenAndServe(":5000", handlers.CORS(header, methods, origins)(r))
+	if err := grpcServer.Serve(lis); err != nil {
+		log.Fatalf("Failed to ser grpc server")
 	}
 }
