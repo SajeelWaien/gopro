@@ -18,7 +18,7 @@ func main() {
 	client := proto.NewSelectAgentClient(conn)
 
 	message := proto.AgentName{
-		Name: "Neon",
+		Name: "Chamber",
 	}
 	res, err := client.SelectAgent(context.Background(), &message)
 

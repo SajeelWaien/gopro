@@ -98,8 +98,6 @@ func (s *Server) SelectAgent(ctx context.Context, message *proto.AgentName) (*pr
 	var agent models.Agent
 	result := database.DBCon.Where("name = ?", message.Name).First(&agent)
 
-	log.Printf("===> %+v", &agent)
-
 	if result.Error != nil {
 		return nil, result.Error
 	}
